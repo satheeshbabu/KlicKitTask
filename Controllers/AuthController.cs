@@ -18,11 +18,13 @@ namespace KlicKitApi.Controllers
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
+        private readonly IUnitOfWork _db;
+        public AuthController(IAuthRepository repo,IUnitOfWork db, IConfiguration config, IMapper mapper)
         {
             _mapper = mapper;
             _config = config;
             _repo = repo;
+            _db = db; 
         }
 
         [HttpPost("register")]
@@ -35,10 +37,13 @@ namespace KlicKitApi.Controllers
 
             var userToCreate = _mapper.Map<User>(userForRegisterDto);
 
-            var createdUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
+            var createdUser = _repo.Register(userToCreate, userForRegisterDto.Password);
+            
+            _db.Add<User>(createdUser);
+            if(!await _db.SaveAll())
+                return BadRequest("Not Saved"); 
 
             var userToReturn = _mapper.Map<ProductForDetailedDto>(createdUser);
-
             return CreatedAtRoute("GetUser", new {controller = "Users", id = createdUser.Id}, userToReturn);
         }
 

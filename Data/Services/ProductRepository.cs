@@ -43,8 +43,11 @@ namespace KlicKitApi.Data.Services
 
         public async Task<PagedList<UserProducts>> GetUserProducts(UserProductsParams userProductsParams)
         {
-            var userProducts = _context.UserProducts.AsQueryable();                             
-            
+            var userProducts = _context.UserProducts.AsQueryable();  
+
+            if(userProductsParams.UserId != null)
+                userProducts = userProducts.Where(up => up.UserId != userProductsParams.UserId);
+
             if (!string.IsNullOrEmpty(userProductsParams.OrderBy))
             {
                 switch (userProductsParams.OrderBy)

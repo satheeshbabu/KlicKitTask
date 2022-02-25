@@ -11,7 +11,9 @@ namespace KlicKitApi.Helpers
         {
             get { return pageSize;}
             set { pageSize = (value > MaxPageSize) ? MaxPageSize : value;}
-        }                
+        }
+        public Guid UserId { get; set; }        
+                        
         public string OrderBy { get; set; } 
     }
 }
