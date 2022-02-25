@@ -25,10 +25,11 @@ namespace KlicKitApi.Controllers
         private readonly IMapper _mapper;
         public readonly IProductRepository _product;
         public readonly IAuthRepository _auth;
+        private readonly IUnitOfWork _db;
         
         
 
-        public ProductController(DataContext dbContext, ILogger<ProductController> logger,
+        public ProductController(DataContext dbContext, ILogger<ProductController> logger, IUnitOfWork unitOfWork,
                                  IMapper mapper, IProductRepository product, IAuthRepository auth)
         {
             _dbContext = dbContext;
@@ -36,6 +37,7 @@ namespace KlicKitApi.Controllers
             _mapper = mapper;
             _product = product;
             _auth = auth;
+            _db = unitOfWork;
         }
         
         
@@ -88,6 +90,73 @@ namespace KlicKitApi.Controllers
                 usersRequests.TotalCount, usersRequests.TotalPages);
 
             return Ok(usersRequestsToReturn);
+        }
+
+        [HttpPut("{productId}")]
+        public async Task<IActionResult> UserRequest(Guid productId)
+        {
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = await _auth.GetUser(userId);
+            if (user == null)
+                return Unauthorized();
+
+            var productFromRepo = await _product.GetProduct(productId);
+            if (productFromRepo == null)
+                return BadRequest("Not Found");
+
+            user.Products.Append(new UserProducts
+            {
+                ProductId = productFromRepo.Id, 
+                UserId = user.Id
+            });
+
+
+            if (await _db.SaveAll())
+                return Ok();
+
+            throw new Exception($"Failed on save");
+        }
+
+        [HttpPut("{requestId}")]
+        public async Task<IActionResult> ApproveRequest(Guid requestId)
+        {
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = await _auth.GetUser(userId);
+            if (user == null)
+                return Unauthorized();
+
+            var userProductFromRepo = await _product.GetUserProduct(requestId);
+            if (userProductFromRepo == null)
+                return BadRequest("Not Found");
+            
+            userProductFromRepo.IsChecked = true;
+            userProductFromRepo.IsApproved = true;
+
+            if (await _db.SaveAll())
+                return Ok();
+
+            throw new Exception($"Failed on save");
+        }
+
+        [HttpPut("{requestId}")]
+        public async Task<IActionResult> RejectRequest(Guid requestId)
+        {
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = await _auth.GetUser(userId);
+            if (user == null)
+                return Unauthorized();
+
+            var userProductFromRepo = await _product.GetUserProduct(requestId);
+            if (userProductFromRepo == null)
+                return BadRequest("Not Found");
+            
+            userProductFromRepo.IsChecked = true;
+            userProductFromRepo.IsApproved = false;
+
+            if (await _db.SaveAll())
+                return Ok();
+
+            throw new Exception($"Failed on save");
         }
     }
 }

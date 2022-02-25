@@ -19,12 +19,12 @@ namespace KlicKitApi.Controllers
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _db;
-        public AuthController(IAuthRepository repo,IUnitOfWork db, IConfiguration config, IMapper mapper)
+        public AuthController(IAuthRepository repo,IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper)
         {
             _mapper = mapper;
             _config = config;
             _repo = repo;
-            _db = db; 
+            _db = unitOfWork; 
         }
 
         [HttpPost("register")]

@@ -80,6 +80,11 @@ namespace KlicKitApi.Data.Services
             return await PagedList<UserProducts>.CreateAsync(usersRequests, userProductsParams.PageNumber, userProductsParams.PageSize);
         }
 
-        
+        public async Task<UserProducts> GetUserProduct(Guid id)
+        {
+            var userProduct = await _context.UserProducts.FirstOrDefaultAsync(p => p.Id == id);
+            return userProduct;
+        }
+
     }
 }

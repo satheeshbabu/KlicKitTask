@@ -4,6 +4,7 @@ namespace KlicKitApi.Dtos
 {
     public class UserProductsForListDto
     {
+        public Guid Id { get; set; }        
         public Guid UserId { get; set; }            
         public UserForDetailedDto User { get; set; }
         public Guid ProductId { get; set; }      
