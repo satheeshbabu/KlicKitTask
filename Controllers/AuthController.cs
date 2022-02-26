@@ -77,7 +77,7 @@ namespace KlicKitApi.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            var user = _mapper.Map<ProductForDetailedDto>(userFromRepo);
+            var user = _mapper.Map<UserForDetailedDto>(userFromRepo);
 
             return Ok(new
             {

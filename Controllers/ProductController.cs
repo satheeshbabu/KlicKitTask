@@ -122,7 +122,7 @@ namespace KlicKitApi.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var user = await _auth.GetUser(userId);
-            if (user == null)
+            if (user == null || user.Role != 1)
                 return Unauthorized();
 
             var userProductFromRepo = await _product.GetUserProduct(requestId);
@@ -143,7 +143,7 @@ namespace KlicKitApi.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var user = await _auth.GetUser(userId);
-            if (user == null)
+            if (user == null || user.Role != 1)
                 return Unauthorized();
 
             var userProductFromRepo = await _product.GetUserProduct(requestId);
