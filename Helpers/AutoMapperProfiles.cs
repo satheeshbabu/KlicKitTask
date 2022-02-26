@@ -13,7 +13,11 @@ namespace KlicKitApi.Helpers
             CreateMap<UserForRegisterDto, User>();
 
             CreateMap<Product, ProductForDetailedDto>(); 
-            CreateMap<Product, ProductForListDto>();            
+            CreateMap<Product, ProductForListDto>(); 
+            
+            CreateMap<UserProducts, UserProductsForListDto>(); 
+            CreateMap<UserProducts, UserProductsForListDto>(); 
+
         }
     }
 }

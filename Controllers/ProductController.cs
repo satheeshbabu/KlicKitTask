@@ -15,9 +15,9 @@ using Microsoft.Extensions.Logging;
 
 namespace KlicKitApi.Controllers
 {
-    [ApiController]
     [Authorize]
     [Route("[Controller]")]
+    [ApiController]
     public class ProductController : ControllerBase
     {
         private readonly DataContext _dbContext;
@@ -42,8 +42,8 @@ namespace KlicKitApi.Controllers
         
         
 
-        [HttpGet("{id}", Name = "GetProduct")]
-        public async Task<IActionResult> GetUser(Guid id)
+        [HttpGet("GetProduct/{id}")]
+        public async Task<IActionResult> GetProduct(Guid id)
         {
             var product = await _product.GetProduct(id);
 
@@ -92,7 +92,7 @@ namespace KlicKitApi.Controllers
             return Ok(usersRequestsToReturn);
         }
 
-        [HttpPut("{productId}")]
+        [HttpPut("UserRequest/{productId}")]
         public async Task<IActionResult> UserRequest(Guid productId)
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -104,20 +104,26 @@ namespace KlicKitApi.Controllers
             if (productFromRepo == null)
                 return BadRequest("Not Found");
 
-            user.Products.Append(new UserProducts
+            var userProduct = new UserProducts
             {
-                ProductId = productFromRepo.Id, 
-                UserId = user.Id
-            });
-
-
+                Id = Guid.NewGuid(),
+                ProductId = productId,
+                Product = productFromRepo,
+                User = user,
+                UserId = userId,
+                RequestTime = DateTime.Now,
+                IsApproved = false,
+                IsChecked = false
+            };
+            _db.Add<UserProducts>(userProduct);            
+            
             if (await _db.SaveAll())
                 return Ok();
 
             throw new Exception($"Failed on save");
         }
 
-        [HttpPut("{requestId}")]
+        [HttpPut("ApproveRequest/{requestId}")]
         public async Task<IActionResult> ApproveRequest(Guid requestId)
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -138,7 +144,7 @@ namespace KlicKitApi.Controllers
             throw new Exception($"Failed on save");
         }
 
-        [HttpPut("{requestId}")]
+        [HttpPut("RejectRequest/{requestId}")]
         public async Task<IActionResult> RejectRequest(Guid requestId)
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);

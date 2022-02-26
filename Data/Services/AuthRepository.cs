@@ -67,7 +67,9 @@ namespace KlicKitApi.Data.Services
     
         public async Task<User> GetUser(Guid id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context.Users
+                                    .Include(pr => pr.Products)
+                                    .FirstOrDefaultAsync(u => u.Id == id);
 
             return user;
         }        

@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace KlicKitApi.Models
 {
     public class UserProducts
     {
+        [Key]
         public Guid Id { get; set; }        
         public Guid UserId { get; set; }            
         public User User { get; set; }

@@ -9,6 +9,6 @@ namespace KlicKitApi.Dtos
         public string Title { get; set; }
         public string Description { get; set; }             
         public float Price { get; set; } 
-        public IEnumerable<ProductForDetailedDto> Users { get; set; }     
+        public IEnumerable<UserProductsForListDto> Users { get; set; }     
     }
 }

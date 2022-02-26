@@ -17,14 +17,18 @@ namespace KlicKitApi.Data.Services
 
         public async Task<Product> GetProduct(Guid id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products
+                                .Include(us => us.Users)
+                                .FirstOrDefaultAsync(p => p.Id == id);
 
             return product;
         }
 
         public async Task<PagedList<Product>> GetProducts(ProductParams productParams)
         {
-            var products = _context.Products.AsQueryable();                             
+            var products = _context.Products
+                            .Include(us => us.Users)
+                            .AsQueryable();                             
             
             if (!string.IsNullOrEmpty(productParams.OrderBy))
             {
@@ -64,7 +68,10 @@ namespace KlicKitApi.Data.Services
 
         public async Task<PagedList<UserProducts>> GetUsersRequests(UserProductsParams userProductsParams)
         {
-            var usersRequests = _context.UserProducts.Where(up => up.IsChecked == false).AsQueryable();                             
+            var usersRequests = _context.UserProducts
+                                .Include(us => us.User)
+                                .Include(pr => pr.Product)
+                                .Where(up => up.IsChecked == false).AsQueryable();                             
             
             if (!string.IsNullOrEmpty(userProductsParams.OrderBy))
             {

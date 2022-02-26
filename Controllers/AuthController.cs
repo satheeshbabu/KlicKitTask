@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace KlicKitApi.Controllers
 {
+    [ApiController]    
+    [Route("[Controller]")]
     public class AuthController: ControllerBase
     {
         private readonly IAuthRepository _repo;
@@ -43,8 +45,8 @@ namespace KlicKitApi.Controllers
             if(!await _db.SaveAll())
                 return BadRequest("Not Saved"); 
 
-            var userToReturn = _mapper.Map<ProductForDetailedDto>(createdUser);
-            return CreatedAtRoute("GetUser", new {controller = "Users", id = createdUser.Id}, userToReturn);
+            var userToReturn = _mapper.Map<UserForDetailedDto>(createdUser);
+            return CreatedAtRoute("GetUser", new {controller = "Auth", id = createdUser.Id}, userToReturn);
         }
 
         [HttpPost("login")]
@@ -84,6 +86,16 @@ namespace KlicKitApi.Controllers
                 token = tokenHandler.WriteToken(token),
                 user
             });
+        }
+
+        [HttpGet("{id}", Name = "GetUser")]
+        public async Task<IActionResult> GetUser(Guid id)
+        {
+            var userFromRepo = await _repo.GetUser(id);
+
+            var userToReturn = _mapper.Map<UserForDetailedDto>(userFromRepo);
+
+            return Ok(userToReturn);
         }
         
     }
